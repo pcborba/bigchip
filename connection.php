@@ -4,9 +4,9 @@
 
 $servername = "mysql:host=localhost;dbname=myfr6168_dev003;charset=utf8"; 
 
-$username = "myfr6168_dev003";
+$username = "root";
 
-$password = "PABLO003";
+$password = "";
 
 
 

@@ -40,11 +40,11 @@ to pass the source url and also the basic parameters to assemble them
 
 var tables = new Array();
 
-var url0  = "http://dev003.badiee.com/readTable.php";
+var url0  = "http://localhost/bigchip_/readTable.php";
 
-var url1 = "http://dev003.badiee.com/readTableAccountTotal.php";
+var url1 = "http://localhost/bigchip_/readTableAccountTotal.php";
 
-var url2 = "http://dev003.badiee.com/readTableAccount.php";
+var url2 = "http://localhost/bigchip_/readTableAccount.php";
 
 
 

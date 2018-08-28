@@ -34,9 +34,10 @@ parameters to assemble them, in this case we need tho change chartupdade
 function
 
 */
+var url0= "http://localhost/bigchip_/readChart.php?startDate="+ start.toString()+"&endDate="+end.toString();
+var url1= "http://localhost/bigchip_/readChartAccount.php?startDate="+ start.toString()+"&endDate="+end.toString();
 
-
-var myChart;
+var myChart0="", myChart1="";
 
 
 /*
@@ -50,67 +51,56 @@ parameters to identify how the chart will be created
 */
 
 
-function chartUpdate(start, end){
-
-    myChart = c3.generate({
-
-        data: {
-
-            x:'GLAccountName',
-
-            url: 'http://dev003.badiee.com/readChart.php?startDate='+ start.toString()+'&endDate='+end.toString(),
-
-            mimeType: 'json',
-
-            keys: {
-
-                value:['GLAccountName','AverageValue','HighValue', 'TotalValue']
-
+function chartUpdate(url, chart, start, end){
+    if(url == url0){
+        myChart0 = c3.generate({
+            data: {
+                x:'GLAccountName',
+                url: url0,
+                mimeType: 'json',
+                keys: {
+                    value:['GLAccountName','AverageValue','HighValue', 'TotalValue']
+                },
+                names: {
+                    AverageValue: 'Average',
+                    HighValue: 'Highest',
+                    TotalValue:'Total'
+                },
+                type: 'bar'
             },
-
-            names: {
-
-                AverageValue: 'Average',
-
-                HighValue: 'Highest',
-
-                TotalValue:'Total'
-
+            color: {
+                pattern: ['#1f77b4', '#1777e0', '#1927e9']
             },
-
-            type: 'bar'
-
-        },
-
-        color: {
-
-            pattern: ['#1f77b4', '#1777e0', '#1927e9']
-
-        },
-
-        axis: {
-
-            x: {
-
-                type: 'category'
-
-            }
-
-        },
-
-        bar: {
-
-            width: {
-
-                ratio: 0.7
-
-            }
-
-        }
-
-    
-
-    });
+            axis: {
+                x: {
+                    type: 'category'
+                }
+            },
+            bar: {
+                width: {
+                    ratio: 0.7
+                }
+            },
+            bindto: '#chart'        
+        });
+    }else if(url == url1){
+        myChart1 = c3.generate({
+            data: {
+                x:'GLAccountName',
+                url: url1,
+                mimeType: 'json',
+                keys: {
+                    value:['GLAccountName','TotalValue'],
+                },
+                names: {
+                    GLAccountName: 'Account',
+                    TotalValue:'Total'
+                },
+                type: 'pie'
+            },
+            bindto: '#chart1'        
+        });
+    }
 
 }
 
@@ -130,20 +120,19 @@ using another external library available on http://www.daterangepicker.com
 
 $(document).ready(function() {
 
-    chartUpdate(start, end);
 
     function cb(start, end) {
-
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
-
         console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-
-        myChart.destroy();
-
-        chartUpdate(start, end);
-
+        url0= "http://localhost/bigchip_/readChart.php?startDate="+ start.toString()+"&endDate="+end.toString();
+        url1= "http://localhost/bigchip_/readChartAccount.php?startDate="+ start.toString()+"&endDate="+end.toString();
+        myChart0.unload();
+        myChart1.unload();
+        //myChart0.flush();
+        //myChart1.flush();
+        chartUpdate(url0, myChart0,start, end);
+        chartUpdate(url1, myChart1,start, end); 
     }
-
 
 
     $('#reportrange').daterangepicker({
@@ -175,7 +164,8 @@ $(document).ready(function() {
 
 
 } );        
-
+chartUpdate(url0, myChart0,start, end);
+chartUpdate(url1, myChart1,start, end);
 
 
 
