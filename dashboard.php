@@ -21,8 +21,15 @@
 </div>
     
 <div class="containerTable">
+
+    <div id="chart_div"></div>
+
+</div>
+
+<div class="containerTable">
     <div id="chart1"></div>
 </div>
+
 
 <?php
 

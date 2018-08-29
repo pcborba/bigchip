@@ -19,7 +19,12 @@ in which data will be retrieved from the DB to compose the
 JSON content that will be feeding the charts.
 
 */
-
+var arrJSONContent;
+var testenome;
+var xmlhttp;
+var data;
+var chart;
+var options;
 
 var start = moment().subtract(20, 'days');
 
@@ -34,8 +39,9 @@ parameters to assemble them, in this case we need tho change chartupdade
 function
 
 */
-var url0= "http://localhost/bigchip_/readChart.php?startDate="+ start.toString()+"&endDate="+end.toString();
-var url1= "http://localhost/bigchip_/readChartAccount.php?startDate="+ start.toString()+"&endDate="+end.toString();
+
+var url0= "http://dev003.badiee.com/readChart.php?startDate="+ start.toString()+"&endDate="+end.toString();
+var url1= "http://dev003.badiee.com/readChartAccountPie.php?startDate="+ start.toString()+"&endDate="+end.toString();
 
 var myChart0="", myChart1="";
 
@@ -50,58 +56,38 @@ parameters to identify how the chart will be created
 
 */
 
-
-function chartUpdate(url, chart, start, end){
-    if(url == url0){
-        myChart0 = c3.generate({
-            data: {
+function chartUpdateC3(url, chart, start, end){
+    myChart0 = c3.generate({
+        data: {
+            
+            url: url0,
+            mimeType: 'json',
+            keys: {
                 x:'GLAccountName',
-                url: url0,
-                mimeType: 'json',
-                keys: {
-                    value:['GLAccountName','AverageValue','HighValue', 'TotalValue']
-                },
-                names: {
-                    AverageValue: 'Average',
-                    HighValue: 'Highest',
-                    TotalValue:'Total'
-                },
-                type: 'bar'
+                value:['AverageValue','HighValue', 'TotalValue']
             },
-            color: {
-                pattern: ['#1f77b4', '#1777e0', '#1927e9']
+            names: {
+                AverageValue: 'Average',
+                HighValue: 'Highest',
+                TotalValue:'Total'
             },
-            axis: {
-                x: {
-                    type: 'category'
-                }
-            },
-            bar: {
-                width: {
-                    ratio: 0.7
-                }
-            },
-            bindto: '#chart'        
-        });
-    }else if(url == url1){
-        myChart1 = c3.generate({
-            data: {
-                x:'GLAccountName',
-                url: url1,
-                mimeType: 'json',
-                keys: {
-                    value:['GLAccountName','TotalValue'],
-                },
-                names: {
-                    GLAccountName: 'Account',
-                    TotalValue:'Total'
-                },
-                type: 'pie'
-            },
-            bindto: '#chart1'        
-        });
-    }
-
+            type: 'bar'
+        },
+        color: {
+            pattern: ['#1b9ccf', '#94dbf7', '#63a7c2']
+        },
+        axis: {
+            x: {
+                type: 'category'
+            }
+        },
+        bar: {
+            width: {
+                ratio: 0.7
+            }
+        },
+        bindto: '#chart'        
+    });
 }
 
 
@@ -117,55 +103,94 @@ as well setting the properties of DatePicker that is generated
 using another external library available on http://www.daterangepicker.com
 
 */
-
 $(document).ready(function() {
+    
 
-
+    chartUpdateC3(url0, myChart0,start, end);
+    
     function cb(start, end) {
         $('#reportrange span').html(start.format('MMMM D, YYYY') + ' - ' + end.format('MMMM D, YYYY'));
         console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
-        url0= "http://localhost/bigchip_/readChart.php?startDate="+ start.toString()+"&endDate="+end.toString();
-        url1= "http://localhost/bigchip_/readChartAccount.php?startDate="+ start.toString()+"&endDate="+end.toString();
+        url0= "http://dev003.badiee.com/readChart.php?startDate="+ start.toString()+"&endDate="+end.toString();
+        url1= "http://dev003.badiee.com/readChartAccount.php?startDate="+ start.toString()+"&endDate="+end.toString();
         myChart0.unload();
-        myChart1.unload();
-        //myChart0.flush();
-        //myChart1.flush();
-        chartUpdate(url0, myChart0,start, end);
-        chartUpdate(url1, myChart1,start, end); 
+        chartUpdateC3(url0, myChart0,start, end);
     }
 
-
     $('#reportrange').daterangepicker({
-
         startDate: start,
-
         endDate: end,
-
         ranges: {
-
         'Today': [moment(), moment()],
-
         'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
-
         'Last 7 Days': [moment().subtract(6, 'days'), moment()],
-
         'Last 30 Days': [moment().subtract(29, 'days'), moment()],
-
         'This Month': [moment().startOf('month'), moment().endOf('month')],
-
         'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
-
         }
-
     }, cb);
-
     cb(start, end);    
 
-
-
 } );        
-chartUpdate(url0, myChart0,start, end);
-chartUpdate(url1, myChart1,start, end);
+
+function chartUpdateGoogleCharts(){
+    arrJSONContent = new Array();
+    testenome = 'TOP 5 Entries by GL Account';
+
+    xmlhttp = new XMLHttpRequest();
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            result = JSON.parse(this.responseText);
+            receivingJSON(result);
+        }
+    };
+    xmlhttp.open("GET", url1, true);
+    xmlhttp.send();
+
+    function receivingJSON(json) {
+        console.log(" Total Value = "+ json[0].TotalValue);
+        for(i = 0; i < json.length; i++){
+            arrJSONContent.push(json[i]);
+        }
+        console.log(arrJSONContent);
+        console.log(arrJSONContent[0].GLAccountName);
+    }
+
+    google.charts.load('current', {
+        callback: function () {
+            drawChart();
+            setInterval(drawChart, (15 * 60 * 1000));
+        
+            function drawChart() {
+            data =  new google.visualization.DataTable();
+            data.addColumn('string', 'GLAccountName');
+            data.addColumn('number', 'TotalValue');
+
+            for(i = 0; i < arrJSONContent.length; i++){
+                console.log(arrJSONContent[i].GLAccountName + " novo " +arrJSONContent[i].TotalValue);
+                data.addRow([arrJSONContent[i].GLAccountName, arrJSONContent[i].TotalValue]);
+            }
+
+            options = {
+                'title': testenome,
+                'width':800,
+                'height':600,
+                pieHole: 0.4,
+                titleTextStyle: { color: '#005de0'},
+                legend: {position:'right', textStyle:{color:'#0069fc', fontSize: 12}},
+                colors: ['#63a7c2', '#00b5fc', '#1b9ccf', '#94dbf7', '#a1d0e3']
+
+
+
+            };
+            chart = new google.visualization.PieChart(document.getElementById('chart_div'));
+            chart.draw(data,options);
+            }
+        },
+        packages: ['corechart']
+    });
+}
+chartUpdateGoogleCharts();
 
 
 

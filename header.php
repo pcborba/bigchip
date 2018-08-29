@@ -37,8 +37,7 @@
 
 		<script src="lib/c3-0.6.7/c3.js"></script>
 
-    	<script src="https://d3js.org/d3.v5.js"></script>
-		
+    	<script src="https://d3js.org/d3.v5.min.js"></script>
 
 
 
@@ -46,6 +45,7 @@
 
 		<link rel="stylesheet" href="https://www.bigchip.ca/bigchip.ca.css/main.css">
 		<link rel="stylesheet" href="css/styleborba.css">
+		<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
 
 
