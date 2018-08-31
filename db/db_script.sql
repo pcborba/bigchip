@@ -47,7 +47,7 @@ DROP TABLE IF EXISTS `entry_items`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `entry_items` (
   `id` int(11) NOT NULL,
-  `value` double NOT NULL,
+  `value` DECIMAL(13,2) NOT NULL,
   `note` varchar(200) DEFAULT NULL,
   `entry_id` int(10) NOT NULL,
   `gl_id` int(11) NOT NULL,
